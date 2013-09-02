@@ -132,7 +132,11 @@
           plot('pip_euclidean', pip(closing, size, eDist), pip(volume, size, eDist), closing, volume);
         }).trigger('change');
         $('a[data-size]').click(function() {
-          $('#size').val($(this).data('size')).trigger('change');
+          var size = $(this).data('size');
+          if (size == 'all') {
+            size = closing.length;
+          }
+          $('#size').val(size).trigger('change');
         });
     });
   </script>
@@ -145,6 +149,7 @@
       <label for="size">Number of dots:</label>
       <input type="number" id="size" value="400" />
       <input type="button" value="refresh" />
+      <a data-size="all" href="#">All points</a>
       <a data-size="400" href="#">400 points</a>
       <a data-size="300" href="#">300 points</a>
       <a data-size="200" href="#">200 points</a>
