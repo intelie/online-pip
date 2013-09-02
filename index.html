@@ -1,5 +1,20 @@
 <html>
   <head>
+    <style>
+      body {margin: 0; font-size:14px; font-family: arial;}
+      fieldset {
+        background: #f1f1f1;
+        float: right;
+        font-weight: normal;
+        border: 1px solid #ccc;
+      }
+      h1 {
+        font-size: 1em;
+        background: #f1f1f1;
+        padding: 8px;
+      }
+    </style>
+
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script src="http://code.highcharts.com/2.3.5/highcharts.js"></script>
     <script src="closing.js"></script>
@@ -53,11 +68,12 @@
 
 
     var plot = function(where, closing, volume, closing_original, volume_original) {
+      console.debug(where);
         new Highcharts.Chart({
             chart: {
                 renderTo: where,
                 type: 'line',
-                height: 300
+                height: 280
             },
             plotOptions: {
               line: {
@@ -74,8 +90,6 @@
               text: where + "-" + closing.length + " of " + closing_original.length + " points " + percent(closing.length, closing_original.length)
             },
             series: [
-                { name: 'Closing Original', data: closing_original, yAxis: 0 },
-                { name: 'Volume Original', data: volume_original, yAxis: 1  },
                 { name: 'Closing', data: closing, yAxis: 0 },
                 { name: 'Volume', data: volume, yAxis: 1 }
             ],
@@ -107,7 +121,7 @@
     $(document).ready(function() {
         var closing = prepare(closingData);
         var volume = prepare(volumeData);
-        // plot('full', closing, volume);
+        plot('full', closing, volume, closing, volume);
 
         $('input:button').click(function() {
           var size = $('#size').trigger('change');
@@ -125,21 +139,22 @@
 </head>
 <body>
 
-  <h1>Google Stock Prices</h1>
+  <h1>Google Stock Prices
+    <fieldset>
+      <legend>PIP settings</legend>
+      <label for="size">Number of dots:</label>
+      <input type="number" id="size" value="400" />
+      <input type="button" value="refresh" />
+      <a data-size="400" href="#">400 points</a>
+      <a data-size="300" href="#">300 points</a>
+      <a data-size="200" href="#">200 points</a>
+      <a data-size="100" href="#">100 points</a>
+      <a data-size="50" href="#">50 points</a>
+    </fieldset>
+  </h1>
 
   <div id="full">
   </div>
-  <fieldset>
-    <legend>PIP settings</legend>
-    <label for="size">Number of dots:</label>
-    <input type="number" id="size" value="400" />
-    <input type="button" value="refresh" />
-    <a data-size="400" href="#">400 points</a>
-    <a data-size="300" href="#">300 points</a>
-    <a data-size="200" href="#">200 points</a>
-    <a data-size="100" href="#">100 points</a>
-    <a data-size="50" href="#">50 points</a>
-  </fieldset>
   <div id="pip_vertical">
   </div>
   <div id="pip_euclidean">
