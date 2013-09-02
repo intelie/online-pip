@@ -1,8 +1,9 @@
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-<script src="http://code.highcharts.com/2.3.5/highcharts.js"></script>
-<script src="closing.js"></script>
-<script src="volume.js"></script>
-
+<html>
+  <head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="http://code.highcharts.com/2.3.5/highcharts.js"></script>
+    <script src="closing.js"></script>
+    <script src="volume.js"></script>
 <script>
     Array.prototype.remove = function(from, to) {
         var rest = this.slice((to || from) + 1 || this.length);
@@ -46,14 +47,23 @@
         return ret;
     }
 
-    var plot = function(where, closing, volume) {
+    var percent = function(size, total) {
+      return parseInt((size / total) * 10000.0) / 100.0 + "%";
+    }
+
+
+    var plot = function(where, closing, volume, closing_original, volume_original) {
         new Highcharts.Chart({
             chart: {
                 renderTo: where,
                 type: 'line',
-                height: 280
+                height: 300
             },
             plotOptions: {
+              line: {
+                lineWidth: 1,
+                shadow: false
+              },
                 series: {
                     marker: {
                         enabled: false
@@ -61,11 +71,13 @@
                 }
             },
             title: {
-                text: where
+              text: where + "-" + closing.length + " of " + closing_original.length + " points " + percent(closing.length, closing_original.length)
             },
             series: [
-                { name: 'Volume', data: volume, yAxis: 1 },
+                { name: 'Closing Original', data: closing_original, yAxis: 0 },
+                { name: 'Volume Original', data: volume_original, yAxis: 1  },
                 { name: 'Closing', data: closing, yAxis: 0 },
+                { name: 'Volume', data: volume, yAxis: 1 }
             ],
             yAxis: [
                 {
@@ -95,20 +107,44 @@
     $(document).ready(function() {
         var closing = prepare(closingData);
         var volume = prepare(volumeData);
-        plot('full', closing, volume);
-        plot('pip_vertical', pip(closing, 400, vDist), pip(volume, 400, vDist));
-        plot('pip_euclidean', pip(closing, 400, eDist), pip(volume, 400, eDist));
+        // plot('full', closing, volume);
+
+        $('input:button').click(function() {
+          var size = $('#size').trigger('change');
+        });
+        $('#size').change(function() {
+          var size = $(this).val();
+          plot('pip_vertical', pip(closing, size, vDist), pip(volume, size, vDist), closing, volume);
+          plot('pip_euclidean', pip(closing, size, eDist), pip(volume, size, eDist), closing, volume);
+        }).trigger('change');
+        $('a[data-size]').click(function() {
+          $('#size').val($(this).data('size')).trigger('change');
+        });
     });
-</script>
+  </script>
+</head>
+<body>
 
-<h1>Google Stock Prices</h1>
+  <h1>Google Stock Prices</h1>
 
-<div id="full">
-</div>
-<div id="pip_vertical">
-</div>
-<div id="pip_euclidean">
-</div>
-
+  <div id="full">
+  </div>
+  <fieldset>
+    <legend>PIP settings</legend>
+    <label for="size">Number of dots:</label>
+    <input type="number" id="size" value="400" />
+    <input type="button" value="refresh" />
+    <a data-size="400" href="#">400 points</a>
+    <a data-size="300" href="#">300 points</a>
+    <a data-size="200" href="#">200 points</a>
+    <a data-size="100" href="#">100 points</a>
+    <a data-size="50" href="#">50 points</a>
+  </fieldset>
+  <div id="pip_vertical">
+  </div>
+  <div id="pip_euclidean">
+  </div>
+  </body>
+</html>
 
 
